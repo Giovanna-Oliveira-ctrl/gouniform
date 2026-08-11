@@ -542,7 +542,6 @@ function getMainHTML() {
   const nav = [
     {id:'dashboard',label:'Dashboard',    icon:'📊'},
     {id:'stock',    label:'Estoque',      icon:'📦'},
-    {id:'movs',     label:'Movimentações',icon:'🔄'},
     {id:'admin',    label:'Administração',icon:'⚙️'},
   ];
   const navHTML = nav.map(n=>`
@@ -552,20 +551,16 @@ function getMainHTML() {
   const titles = {
     dashboard:{t:'Dashboard',s:'Visão geral do estoque'},
     stock:    {t:'Estoque',s:'Entradas, saídas e quantidades'},
-    movs:     {t:'Movimentações',s:'Histórico de entradas e saídas'},
     admin:    {t:'Administração',s:'Dados e saúde do sistema'},
   };
   const cur = titles[S.sec]||{t:'',s:''};
-  const hoje = S.movs.filter(m=>m.ts && m.ts.slice(0,10)===new Date().toISOString().slice(0,10)).length;
-  const pills = {movs: hoje>0?`${hoje} hoje`:null};
-  const pillHTML = pills[S.sec] ? `<span class="tb-pill">${esc(pills[S.sec])}</span>` : '';
+  const pillHTML = '';
   const avBg = 'var(--brand)';
   const avTxt = 'AD';
   let content = '';
-  if (S.sec==='dashboard') content = getDashboard();
-  else if (S.sec==='stock') content = getStock();
-  else if (S.sec==='movs') content = getMovs();
+  if (S.sec==='stock') content = getStock();
   else if (S.sec==='admin') content = getAdmin();
+  else content = getDashboard();
   return `<div class="app">
     <aside class="sb">
       <div class="sb-top">
@@ -730,6 +725,7 @@ function getAdmin() {
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <button class="btn bp sm" onclick="backupData()">💾 Baixar backup (JSON)</button>
         <button class="btn bgh sm" onclick="exportStockCSV()">📄 Exportar estoque (CSV)</button>
+        <button class="btn bgh sm" onclick="exportMovsCSV()">🧾 Exportar entradas e saídas (CSV)</button>
         <button class="btn bgh sm" onclick="refreshData()">🔄 Recarregar dados</button>
       </div>
       <div class="divider"></div>
@@ -812,6 +808,7 @@ function getStock() {
                 <button class="btn bok sm" onclick="openMov('${esc(item.id)}','${S.stockTab}','entrada')" title="Registrar entrada">↓ Entrada</button>
                 <button class="btn bno sm" onclick="openMov('${esc(item.id)}','${S.stockTab}','saida')" title="Registrar saída">↑ Saída</button>
                 <button class="ico-btn" onclick="openEditStock('${esc(item.id)}','${S.stockTab}')" title="Editar item">✏️</button>
+                <button class="ico-btn" onclick="openDelStock('${esc(item.id)}','${S.stockTab}')" title="Excluir item">🗑️</button>
               </div>
             </td>
           </tr>`;
@@ -840,6 +837,7 @@ function getModal() {
   if (m==='mov')       return getMovModal();
   if (m==='editStock') return getEditStockModal();
   if (m==='addStock')  return getAddStockModal();
+  if (m==='delStock')  return getDelStockModal();
   return '';
 }
 
@@ -939,38 +937,9 @@ async function salvarMov() {
   closeModal();
 }
 
-// ─── MOVIMENTAÇÕES (histórico) ────────────────────────────────────────────────
-function getMovs() {
-  const f = S.movFiltro;
-  const lista = f==='todos' ? S.movs : S.movs.filter(m=>m.tipo===f);
-  const tabs = ['todos','entrada','saida'].map(t=>`
-    <div class="tab${f===t?' on':''}" onclick="S.movFiltro='${t}';render()">
-      ${t==='todos'?'Todas':t==='entrada'?'↓ Entradas':'↑ Saídas'}
-    </div>`).join('');
-  if (S.movs.length===0)
-    return `<div class="tabs">${tabs}</div>
-      <div class="empty"><div class="i">🔄</div><p>Nenhuma movimentação registrada ainda.</p>
-      <p style="font-size:12.5px;color:var(--t4);margin-top:6px">Use os botões de entrada e saída na tela de Estoque.</p></div>`;
-  const rows = lista.map(m=>`<tr>
-    <td style="white-space:nowrap;font-size:12px;color:var(--t4)">${esc(m.data)}</td>
-    <td>${movBadge(m.tipo)}</td>
-    <td><strong style="color:var(--t1)">${esc(m.item)}</strong></td>
-    <td><span class="chip">${esc(m.tam)}</span></td>
-    <td style="white-space:nowrap"><strong style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:${m.tipo==='entrada'?'var(--ok)':'var(--err)'}">${m.tipo==='entrada'?'+':'−'}${m.qtd}</strong></td>
-    <td style="white-space:nowrap;color:var(--t3)">${m.saldo==null?'—':m.saldo+' un.'}</td>
-    <td style="font-size:12.5px;color:var(--t3)">${esc(m.motivo||'—')}</td>
-    <td style="font-size:12.5px;color:var(--t3);white-space:nowrap">${esc(m.usuario)}</td>
-  </tr>`).join('');
-  return `<div class="ph"><div class="pt">Histórico de movimentações</div>
-    <button class="btn bgh sm" onclick="exportMovsCSV()">📄 Exportar CSV</button>
-  </div>
-  <div class="tabs">${tabs}</div>
-  <div class="card" style="padding:0"><div class="tw"><table>
-    <thead><tr><th>Data</th><th>Tipo</th><th>Item</th><th>Tam.</th><th>Qtd.</th><th>Saldo</th><th>Motivo</th><th>Por</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div></div>`;
-}
-
+// ─── EXPORTAÇÃO DO HISTÓRICO ──────────────────────────────────────────────────
+// A tela de movimentações foi removida, mas o histórico continua sendo gravado
+// no banco a cada entrada/saída e pode ser baixado em Administração.
 function exportMovsCSV() {
   try {
     const linhas = [['Data','Tipo','Item','Tamanho','Quantidade','Saldo depois','Motivo','Usuário'].join(';')];
@@ -1064,6 +1033,53 @@ function getAddStockModal() {
   const footer = `<button class="btn bgh" onclick="closeModal()">Cancelar</button><button class="btn bp" onclick="addStockItem()">Adicionar</button>`;
   return modalShell(`Novo item — ${label}`, body, footer);
 }
+function openDelStock(id, tab) {
+  const item = getItemList(tab).find(x=>x.id===id);
+  if (!item) return;
+  S.modal='delStock';
+  S.modalForm={id, _tab:tab, nome:item.name, icon:item.icon, stock:{...item.stock}};
+  S.modalErr=''; render();
+}
+
+function getDelStockModal() {
+  const mf = S.modalForm;
+  const total = Object.values(mf.stock||{}).reduce((a,b)=>a+b,0);
+  const usos = S.movs.filter(m=>m.itemId===mf.id).length;
+  const comSaldo = total > 0;   // item com saldo exige digitar o nome
+  const err = S.modalErr ? `<div class="flash e">⚠️ ${esc(S.modalErr)}</div>` : '';
+  const body = `${err}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span style="font-size:26px">${mf.icon||'📦'}</span>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700">${esc(mf.nome)}</div>
+        <div style="font-size:12px;color:var(--t3)">${total} un. em estoque${usos>0?` · ${usos} movimenta${usos>1?'ções':'ção'} no histórico`:''}</div>
+      </div>
+    </div>
+    ${comSaldo ? `<div class="flash e">Ainda há <strong>${total} unidade${total>1?'s':''}</strong> em estoque. Se for baixa de inventário, o recomendado é registrar a saída antes de excluir.</div>` : ''}
+    <p style="font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:${comSaldo?'14px':'0'}">
+      O item sai da lista de estoque e não pode ser recuperado.
+      ${usos>0?'O histórico de movimentações continua guardado.':''}
+    </p>
+    ${comSaldo ? `<div class="fg" style="margin-bottom:0">
+      <label>Para confirmar, digite o nome do item</label>
+      <input id="del-nome" autocomplete="off" placeholder="${esc(mf.nome)}" value="${esc(mf.confirmaNome||'')}"
+             oninput="S.modalForm.confirmaNome=this.value;syncDelBtn()">
+    </div>` : ''}`;
+  const travado = comSaldo && (mf.confirmaNome||'').trim().toLowerCase() !== (mf.nome||'').trim().toLowerCase();
+  const footer = `<button class="btn bgh" onclick="closeModal()">Cancelar</button>
+    <button class="btn bno" id="del-btn" onclick="deleteStockItem()"${(travado||S.busy)?' disabled':''}>
+      ${S.busy?'Excluindo…':'Excluir item'}
+    </button>`;
+  return modalShell('Excluir item do estoque', body, footer);
+}
+
+// Atualiza só o botão enquanto digita, para não perder o foco do campo.
+function syncDelBtn() {
+  const mf = S.modalForm, btn = document.getElementById('del-btn');
+  if (!btn) return;
+  btn.disabled = (mf.confirmaNome||'').trim().toLowerCase() !== (mf.nome||'').trim().toLowerCase();
+}
+
 async function deleteStockItem() {
   const mf = S.modalForm;
   const {error} = await sb.from('estoque').delete().eq('id', mf.id);
