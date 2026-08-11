@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GoUniform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brand:#E8461F;--brand-h:#C43A18;--brand-l:#FFF0EB;--brand-m:#FCDDD5;
+  --bg:#F6F4F1;--surf:#fff;--surf2:#FAFAF8;
+  --sb:#16110C;--sb-hv:rgba(255,255,255,.06);--sb-ac:rgba(232,70,31,.14);--sb-br:rgba(255,255,255,.07);
+  --ok:#16A34A;--ok-l:#F0FDF4;--err:#DC2626;--err-l:#FEF2F2;--warn:#D97706;--warn-l:#FFFBEB;
+  --t1:#1C1917;--t2:#44403C;--t3:#78716C;--t4:#A8A29E;--ti:#FAF9F7;
+  --bd:#E8E2DA;--r:14px;--rsm:9px;
+  --sh:0 1px 2px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.06);
+  --sh2:0 4px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.10);
+  --sh3:0 8px 16px rgba(0,0,0,.06),0 24px 56px rgba(0,0,0,.14);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;}
+/* APP SHELL */
+.app{display:flex;height:100vh;overflow:hidden;}
+/* SIDEBAR */
+.sb{width:248px;flex-shrink:0;background:var(--sb);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-top{padding:28px 22px 22px;border-bottom:1px solid var(--sb-br);margin-bottom:8px;}
+.sb-logo{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;color:var(--ti);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;}
+.sb-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0;}
+.sb-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.8px;margin-top:4px;}
+.sb-nav{flex:1;padding:4px 12px;}
+.sb-sec{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:rgba(255,255,255,.22);padding:16px 10px 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.48);font-size:13.5px;font-weight:500;margin-bottom:1px;user-select:none;position:relative;transition:background .12s,color .12s;}
+.sb-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:0;border-radius:0 2px 2px 0;background:var(--brand);transition:height .15s;}
+.sb-item:hover{background:var(--sb-hv);color:rgba(255,255,255,.8);}
+.sb-item.on{background:var(--sb-ac);color:var(--ti);font-weight:600;}
+.sb-item.on::before{height:20px;}
+.sb-ico{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;min-width:20px;text-align:center;}
+.sb-foot{padding:16px 12px 20px;border-top:1px solid var(--sb-br);}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;transition:background .12s;}
+.sb-user:hover{background:var(--sb-hv);}
+.sb-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.3px;}
+.sb-uname{font-size:13px;font-weight:600;color:var(--ti);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+.sb-urole{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px;}
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:var(--surf);border-bottom:1px solid var(--bd);padding:0 32px;height:64px;display:flex;align-items:center;flex-shrink:0;gap:16px;}
+.tb-l{flex:1;}
+.tb-title{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;color:var(--t1);letter-spacing:-.2px;}
+.tb-sub{font-size:12.5px;color:var(--t3);margin-top:1px;}
+.tb-pill{background:var(--brand-l);color:var(--brand);font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:99px;white-space:nowrap;}
+.content{padding:28px 32px;flex:1;}
+/* CARDS */
+.card{background:var(--surf);border-radius:var(--r);box-shadow:var(--sh);padding:24px;border:1px solid var(--bd);}
+.card-t{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--t2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.sc{background:var(--surf);border-radius:var(--r);padding:20px 22px;border:1px solid var(--bd);box-shadow:var(--sh);border-top:3px solid transparent;}
+.sc.cb{border-top-color:var(--brand);}.sc.cw{border-top-color:var(--warn);}
+.sc.co{border-top-color:var(--ok);}.sc.cu{border-top-color:#3B82F6;}
+.sc-n{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;color:var(--t1);letter-spacing:-1px;line-height:1;margin:12px 0 6px;}
+.sc-l{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;}
+.sc-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;margin-top:8px;}
+.sc-tag.ok{background:var(--ok-l);color:#15803D;}.sc-tag.w{background:var(--warn-l);color:#92400E;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--surf2);}
+th{text-align:left;padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--bd);white-space:nowrap;}
+td{padding:12px 16px;border-bottom:1px solid var(--bd);color:var(--t2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--surf2);}
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+.bdg::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.bdg.pendente{background:#FEF3C7;color:#92400E;}.bdg.pendente::before{background:var(--warn);}
+.bdg.aprovado{background:var(--ok-l);color:#166534;}.bdg.aprovado::before{background:var(--ok);}
+.bdg.entregue{background:#EFF6FF;color:#1E40AF;}.bdg.entregue::before{background:#3B82F6;}
+.bdg.rejeitado{background:var(--err-l);color:#991B1B;}.bdg.rejeitado::before{background:var(--err);}
+.tb-b{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+.tb-Manha{background:#FEF9C3;color:#78350F;}.tb-Tarde{background:#E0F2FE;color:#0369A1;}
+.tb-Noite{background:#EDE9FE;color:#4C1D95;}.tb-ADM{background:#F0FDF4;color:#14532D;}
+.tb-JovemAprendiz{background:#FDF2F8;color:#86198F;}
+/* SEARCH */
+.srch{position:relative;margin-bottom:20px;}
+.srch input{width:100%;height:40px;padding:0 14px 0 38px;border:1.5px solid var(--bd);border-radius:var(--rsm);font-size:13.5px;font-family:inherit;color:var(--t1);background:var(--surf);outline:none;transition:border-color .15s;}
+.srch input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(232,70,31,.08);}
+.srch input::placeholder{color:var(--t4);}
+.srch-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:14px;pointer-events:none;line-height:1;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rsm);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .14s;font-family:inherit;white-space:nowrap;letter-spacing:.1px;}
+.bp{background:var(--brand);color:#fff;}.bp:hover{background:var(--brand-h);box-shadow:0 4px 12px rgba(232,70,31,.3);}
+.bok{background:var(--ok);color:#fff;}.bok:hover{background:#15803D;}
+.bno{background:var(--err);color:#fff;}.bno:hover{background:#B91C1C;}
+.bgh{background:transparent;color:var(--t2);border:1.5px solid var(--bd);}.bgh:hover{background:var(--bg);border-color:var(--t4);}
+.btn.sm{padding:5px 12px;font-size:12px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.ico-btn{padding:6px 8px;border-radius:7px;background:transparent;border:1.5px solid var(--bd);cursor:pointer;font-size:13px;color:var(--t3);transition:all .14s;font-family:inherit;line-height:1;}
+.ico-btn:hover{background:var(--bg);border-color:var(--t3);color:var(--t1);}
+/* TABS */
+.tabs{display:flex;flex-wrap:wrap;gap:2px;background:var(--bd);border-radius:10px;padding:3px;margin-bottom:22px;width:fit-content;}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--t3);transition:all .14s;user-select:none;white-space:nowrap;}
+.tab:hover{color:var(--t1);}.tab.on{background:var(--surf);color:var(--brand);box-shadow:var(--sh);}
+/* TURNO GROUP */
+.tg{margin-bottom:28px;}
+.tg-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.tg-cnt{font-size:11.5px;color:var(--t3);background:var(--surf);padding:2px 8px;border-radius:6px;border:1px solid var(--bd);}
+/* STOCK */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.sc2{background:var(--surf);border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh);padding:18px 20px;}
+.sc2.low-bdr{border-color:var(--warn);border-width:1.5px;}
+.sc2.out-bdr{border-color:var(--err);border-width:1.5px;}
+.sc2-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.sc2-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:7px;}
+.sc2-meta{font-size:11px;color:var(--t4);margin-top:3px;}
+.warn-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-top:5px;}
+.warn-tag.low{background:var(--warn-l);color:#92400E;}.warn-tag.out{background:var(--err-l);color:#991B1B;}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.pill{display:flex;flex-direction:column;align-items:center;padding:6px 10px;border-radius:8px;min-width:46px;text-align:center;}
+.pill-n{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;line-height:1;}
+.pill-l{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-top:2px;}
+.pill.ok{background:#F0FDF4;color:#15803D;}.pill.low{background:var(--warn-l);color:#92400E;}.pill.out{background:var(--err-l);color:#991B1B;}
+/* QTY EDIT */
+.qty-row{display:flex;flex-wrap:wrap;gap:12px;}
+.qty-g{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.qty-g label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);font-weight:700;}
+.qty-g input{width:64px;text-align:center;padding:7px 8px;border:1.5px solid var(--bd);border-radius:7px;font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif;outline:none;}
+.qty-g input:focus{border-color:var(--brand);}
+/* FORMS */
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 13px;border-radius:var(--rsm);border:1.5px solid var(--bd);font-size:13.5px;font-family:inherit;color:var(--t1);background:var(--surf);outline:none;transition:border-color .14s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(232,70,31,.07);}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--t4);}
+.fg textarea{min-height:72px;resize:vertical;}
+.hint{font-size:11px;color:var(--t4);margin-top:4px;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+/* CHECKLIST */
+.ck-list{display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto;border:1.5px solid var(--bd);border-radius:var(--rsm);padding:8px;}
+.ck-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background .1s;}
+.ck-item:hover{background:var(--bg);}
+.ck-item input[type="checkbox"]{width:15px;height:15px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;}
+.ck-lbl{font-size:13px;color:var(--t2);user-select:none;}
+/* UNIFORM MULTI-SELECT */
+.ut-block{margin-bottom:8px;border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;}
+.ut-head{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);}
+.ut-label{flex:1;font-size:13px;font-weight:600;color:var(--t1);}
+.ut-add{background:none;border:none;cursor:pointer;font-size:12px;font-weight:700;color:var(--brand);padding:2px 8px;border-radius:5px;}
+.ut-add:hover{background:var(--brand-l);}
+.ut-entry{display:flex;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid var(--bd);background:var(--surf);}
+.ut-entry select,.ut-entry input{padding:5px 9px;border-radius:6px;border:1.5px solid var(--bd);font-family:inherit;font-size:13px;font-weight:600;outline:none;background:var(--surf);color:var(--t1);}
+.ut-entry select:focus,.ut-entry input:focus{border-color:var(--brand);}
+.ut-entry input[type="number"]{width:64px;text-align:center;}
+.ut-lbl{font-size:11.5px;color:var(--t3);font-weight:500;white-space:nowrap;}
+.ut-del{background:none;border:none;cursor:pointer;color:var(--t4);font-size:16px;line-height:1;padding:2px;border-radius:4px;transition:color .12s;}
+.ut-del:hover{color:var(--err);}
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(22,17,12,.5);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.mo{background:var(--surf);border-radius:18px;box-shadow:var(--sh3);width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--bd);}
+.mo.wide{max-width:680px;}
+.mo-hd{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.mo-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:var(--t1);}
+.mo-x{background:var(--bg);border:none;font-size:16px;cursor:pointer;color:var(--t3);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:background .12s;}
+.mo-x:hover{background:var(--bd);color:var(--t1);}
+.mo-body{padding:22px 26px;overflow-y:auto;flex:1;}
+.mo-foot{padding:14px 26px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--bd);flex-shrink:0;}
+.mo-sec{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t4);margin:18px 0 8px;}
+.divider{height:1px;background:var(--bd);margin:16px 0;}
+/* MISC */
+.empty{text-align:center;padding:48px 24px;color:var(--t4);}
+.empty .i{font-size:36px;margin-bottom:12px;opacity:.7;}
+.empty p{font-size:14px;font-weight:500;}
+.aw{border-radius:var(--rsm);padding:10px 14px;margin-bottom:9px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;border-left:3px solid var(--warn);background:var(--warn-l);color:#92400E;}
+.flash{border-radius:9px;padding:10px 14px;font-size:13px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.flash.e{background:var(--err-l);color:#B91C1C;}.flash.o{background:var(--ok-l);color:#166534;}
+.chip{display:inline-flex;align-items:center;gap:3px;background:var(--bg);border:1px solid var(--bd);padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:500;color:var(--t2);margin:2px;white-space:nowrap;}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
+.pt{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:var(--t1);}
+/* UNIFORM CARDS (employee) */
+.ug{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.uc{background:var(--surf);border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh);padding:22px;position:relative;overflow:hidden;}
+.uc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand);}
+.uc-ico{font-size:32px;margin-bottom:12px;display:block;}
+.uc-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--t1);margin-bottom:8px;}
+.uc-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;margin:2px 2px 0 0;}
+.uc-tag.normal{background:var(--brand-l);color:var(--brand);}
+.uc-tag.qty{background:var(--brand);color:#fff;}
+/* LOGIN */
+.lw{min-height:100vh;display:flex;}
+.ll{width:44%;flex-shrink:0;background:var(--sb);display:flex;flex-direction:column;justify-content:space-between;padding:48px 52px;position:relative;overflow:hidden;}
+.ll::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(232,70,31,.18) 0%,transparent 70%);bottom:-80px;right:-80px;pointer-events:none;}
+.ll::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,70,31,.12) 0%,transparent 70%);top:40px;right:20px;pointer-events:none;}
+.l-brand{position:relative;z-index:1;}
+.l-mark{display:inline-flex;align-items:center;gap:10px;margin-bottom:48px;}
+.l-mdot{width:10px;height:10px;border-radius:50%;background:var(--brand);}
+.l-mname{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.3px;}
+.l-hero{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1.1;}
+.l-hero em{font-style:normal;color:var(--brand);}
+.l-desc{font-size:15px;color:rgba(255,255,255,.42);margin-top:20px;line-height:1.65;max-width:280px;}
+.l-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:36px;}
+.l-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:6px 14px;font-size:12.5px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px;font-weight:500;}
+.l-ft{font-size:11.5px;color:rgba(255,255,255,.2);font-weight:500;position:relative;z-index:1;}
+.lr{flex:1;background:var(--surf);display:flex;flex-direction:column;justify-content:center;padding:52px 56px;}
+.l-ftitle{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-bottom:6px;}
+.l-fsub{font-size:14px;color:var(--t3);margin-bottom:32px;line-height:1.5;min-height:42px;}
+.lf{margin-bottom:14px;}
+.lf label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.lf-in{position:relative;}
+.lf-in input{width:100%;height:50px;padding:0 48px 0 16px;border:1.5px solid var(--bd);border-radius:11px;font-size:14.5px;font-family:inherit;color:var(--t1);background:var(--surf);outline:none;transition:border-color .14s,box-shadow .14s;}
+.lf-in input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(232,70,31,.1);}
+.lf-in input::placeholder{color:var(--t4);}
+.l-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t4);font-size:16px;padding:2px;line-height:1;transition:color .12s;}
+.l-eye:hover{color:var(--t1);}
+.l-btn{width:100%;height:52px;border-radius:11px;background:var(--brand);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;transition:background .14s,box-shadow .14s;margin-top:6px;}
+.l-btn:hover{background:var(--brand-h);box-shadow:0 6px 20px rgba(232,70,31,.35);}
+.l-btn:disabled{background:var(--bd);color:var(--t4);cursor:not-allowed;box-shadow:none;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const inits = n => (n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+const safeCls = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'');
+const today = () => new Date().toLocaleDateString('pt-BR');
+
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://cdvehmxtzdqhpnyxpxbg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8Ee5by-8mxVhpn8lNgsGyw_pzmLk5zf';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Converte o "usuário" digitado num identificador interno para o Supabase Auth.
+// O usuário nunca precisa de e-mail: "joao.silva" vira "joao.silva@gouniform.local".
+// Se digitar algo com "@" (um e-mail real), é aceito como está — mas não é exigido.
+function userToEmail(u){
+  u = (u||'').trim();
+  if (u.includes('@')) return u.toLowerCase();
+  const base = u.normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9._-]/g,'');
+  return base ? base + '@gouniform.local' : '';
+}
+function traduzErro(m){ m = m || '';
+  if (/Invalid login credentials/i.test(m)) return 'Usuário ou senha incorretos.';
+  if (/Email not confirmed/i.test(m)) return 'Cadastro ainda não liberado. Fale com o administrador.';
+  if (/already registered|already been registered|User already registered/i.test(m)) return 'Esse usuário já existe. Tente outro.';
+  if (/Password should be at least|weak/i.test(m)) return 'A senha é muito curta (mínimo 6 caracteres).';
+  if (/rate limit|too many|For security/i.test(m)) return 'Muitas tentativas. Aguarde um instante e tente de novo.';
+  if (/Unable to validate email|invalid format|valid email/i.test(m)) return 'Usuário inválido. Use letras e números (sem espaços).';
+  return m;
+}
+
+// ─── STATIC DATA ──────────────────────────────────────────────────────────────
+const TURNOS  = ['Manhã','Tarde','Noite','ADM','Jovem Aprendiz'];
+const SETORES = ['Expedição','Térmicos','UV','Têxtil','Escritório','Gerência','Almoxarifado','Manutenção','Qualidade'];
+const SIZES   = ['PP','P','M','G','GG','XGG'];
+const AVATAR_COLORS = ['#E8461F','#0891B2','#7C3AED','#059669','#D97706','#DB2777','#2563EB','#DC2626','#65A30D','#EA580C'];
+const UNIF_TYPES = [{id:'camiseta',name:'Camiseta',icon:'👕'},{id:'calca',name:'Calça',icon:'👖'},{id:'moletom',name:'Moletom',icon:'🧥'}];
+const TURNO_ICON = {'Manhã':'🌅','Tarde':'🌤️','Noite':'🌙','ADM':'💼','Jovem Aprendiz':'🌱'};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const S = {
+  auth: null,          // {role, emp}
+  sec: 'dashboard',    // current section
+  stockTab: 'u',       // u/p/k/f/s
+  stockSearch: '',
+  movFiltro: 'todos',  // todos/entrada/saida
+  emps: [],
+  unifs: [
+    {id:'cam-azul',      name:'Camiseta Azul',          icon:'👕',limite:50, minimo:10,stock:{PP:20,P:29,M:33,G:41,GG:16,G1:7,G2:13,G3:15}},
+    {id:'cam-laranja',   name:'Camiseta Laranja',        icon:'👕',limite:50, minimo:10,stock:{PP:0,P:0,M:0,G:10,GG:7}},
+    {id:'cam-goblack',   name:'Camiseta GoBlack',        icon:'👕',limite:0,  minimo:0, stock:{P:9,M:0,G:0,XG2:1,XGG:1}},
+    {id:'cam-manut',     name:'Camiseta Manutenção',     icon:'👕',limite:0,  minimo:0, stock:{P:3,M:0,G:0,GG:3}},
+    {id:'cam-brig',      name:'Camiseta Brigadistas',    icon:'👕',limite:0,  minimo:0, stock:{PP:0,P:0,M:3,G:10,GG:1}},
+    {id:'cam-cipat',     name:'Camiseta CIPAT',          icon:'👕',limite:0,  minimo:0, stock:{PP:0,P:2,M:2,G:0,GG:0}},
+    {id:'moletom',       name:'Moletom',                 icon:'🧥',limite:50, minimo:5, stock:{PP:34,P:25,M:0,G:0,GG:0,XG:52}},
+    {id:'calca',         name:'Calça',                   icon:'👖',limite:50, minimo:5, stock:{PP:16,P:8,M:9,G:7,GG:33}},
+    {id:'saias',         name:'Saias',                   icon:'👗',limite:0,  minimo:0, stock:{SAIAS:19}},
+    {id:'cam-higieniz',  name:'Camisetas Higienizadas',  icon:'👕',limite:0,  minimo:0, stock:{AZUL:35,LARANJA:32,VERMELHA:3,'BB INDUSTRIA':3}},
+  ],
+  pap: [
+    {id:'postit',        name:'Post-it',                     icon:'🟡',limite:10,minimo:5, stock:{Unid:15}},
+    {id:'tesoura',       name:'Tesoura',                     icon:'✂️',limite:5, minimo:3, stock:{Unid:4}},
+    {id:'grampeador',    name:'Grampeador',                  icon:'📎',limite:5, minimo:3, stock:{Unid:1}},
+    {id:'clip',          name:'Clip',                        icon:'📌',limite:10,minimo:5, stock:{CAIXA:1}},
+    {id:'perfurador',    name:'Perfurador de papel',         icon:'🔘',limite:5, minimo:3, stock:{Unid:2}},
+    {id:'idface',        name:'ID face',                     icon:'🪪',limite:5, minimo:3, stock:{Unid:1}},
+    {id:'caderno',       name:'Caderno',                     icon:'📓',limite:10,minimo:5, stock:{Unid:3}},
+    {id:'chaveiro',      name:'Chaveiro de etiqueta',        icon:'🔑',limite:5, minimo:3, stock:{CAIXA:1}},
+    {id:'canetao',       name:'Canetão',                     icon:'🖊️',limite:5, minimo:3, stock:{Unid:2}},
+    {id:'canetas',       name:'Canetas',                     icon:'✏️',limite:3, minimo:1, stock:{CAIXA:3}},
+    {id:'fita',          name:'Fita',                        icon:'📼',limite:5, minimo:2, stock:{DUREX:5,'DUPLA FACE':1,'ADESIVA TRANSP.':8}},
+    {id:'suporte-ducha', name:'Suporte ducha oftalmológica', icon:'👁️',limite:5, minimo:3, stock:{Unid:0}},
+    {id:'impermeavel',   name:'Impermeáveis',                icon:'🧴',limite:5, minimo:3, stock:{Unid:5}},
+    {id:'grampos',       name:'Grampos',                     icon:'📎',limite:3, minimo:1, stock:{CAIXA:4}},
+    {id:'pilhas',       name:'Pilhas',                       icon:'🔋',limite:5, minimo:1, stock:{PACOTE:1}},
+    {id:'etiqueta',      name:'Etiqueta adesiva',            icon:'🏷️',limite:10,minimo:5, stock:{Unid:3}},
+    {id:'regua',         name:'Régua',                       icon:'📏',limite:5, minimo:3, stock:{Unid:1}},
+    {id:'alfinetes',     name:'Alfinetes',                   icon:'📌',limite:5, minimo:2, stock:{CAIXA:1}},
+    {id:'pendrive',      name:'Pen Drive',                   icon:'💾',limite:3, minimo:1, stock:{Unid:2}},
+    {id:'carimbo',       name:'Carimbo',                     icon:'📝',limite:1, minimo:0, stock:{Unid:2}},
+    {id:'plasticor',     name:'Plasticor',                   icon:'🖊️',limite:5, minimo:1, stock:{AMARELO:1,VERMELHO:2,AZUL:1}},
+  ],
+  kit: [
+    {id:'mouse',      name:'Mouse',                  icon:'🖱️',limite:20,minimo:5,stock:{Unid:0}},
+    {id:'teclado',    name:'Teclado',                icon:'⌨️',limite:30,minimo:5,stock:{Unid:24}},
+    {id:'mousepad',   name:'Mousepad',               icon:'🟦',limite:20,minimo:5,stock:{Unid:13}},
+    {id:'headset',    name:'Headset',                icon:'🎧',limite:10,minimo:2,stock:{Unid:0}},
+    {id:'suporte',    name:'Suporte de Monitor',     icon:'🖥️',limite:50,minimo:5,stock:{Unid:39}},
+    {id:'carregador', name:'Carregador p/ Notebook', icon:'🔌',limite:1, minimo:1,stock:{Unid:1}},
+    {id:'webcam',     name:'Webcam',                 icon:'📷',limite:20,minimo:5,stock:{Unid:5}},
+  ],
+  farm: [
+    {id:'soro-fisiol',  name:'Soro Fisiológico (09/27 e 07/27)', icon:'💊',limite:5,  minimo:3, stock:{Unid:2}},
+    {id:'farmax',       name:'Farmax (07/27)',                    icon:'💊',limite:3,  minimo:0, stock:{Unid:0}},
+    {id:'arboreto',     name:'Arboreto (09/27)',                  icon:'🌿',limite:3,  minimo:0, stock:{Unid:1}},
+    {id:'luva-latex',   name:'Luva Latex (02/29)',                icon:'🧤',limite:3,  minimo:1, stock:{CAIXA:2}},
+    {id:'cotonete',     name:'Cotonete',                         icon:'🩹',limite:3,  minimo:0, stock:{CAIXA:2}},
+    {id:'curativo',     name:'Curativo',                         icon:'🩹',limite:3,  minimo:1, stock:{CAIXA:1}},
+    {id:'atadura',      name:'Atadura',                          icon:'🩺',limite:30, minimo:10,stock:{Unid:30}},
+    {id:'agua-ox',      name:'Água Oxigenada (10/27)',           icon:'💧',limite:5,  minimo:3, stock:{Unid:1}},
+    {id:'gaze',         name:'Gaze',                             icon:'🩹',limite:10, minimo:5, stock:{Unid:1}},
+    {id:'fita-micro',   name:'Fita Microporosa (06/27)',         icon:'🩹',limite:3,  minimo:1, stock:{Unid:1}},
+    {id:'injetandoc',   name:'Injetandoc Segurança',             icon:'💉',limite:10, minimo:5, stock:{Unid:9}},
+    {id:'monitor-press',name:'Monitor de Pressão',               icon:'🩺',limite:0,  minimo:0, stock:{Unid:1}},
+    {id:'garrafa-soro', name:'Garrafa de Soro',                  icon:'🫙',limite:10, minimo:5, stock:{Unid:6}},
+    {id:'ibuprofeno',   name:'Ibuprofeno (09/27)',               icon:'💊',limite:0,  minimo:0, stock:{Unid:1}},
+  ],
+  seg: [
+    {id:'oculos-prot',  name:'Óculos de proteção',  icon:'🥽',limite:5,  minimo:3, stock:{Unid:1}},
+    {id:'luva-prot',    name:'Luva de proteção',     icon:'🧤',limite:0,  minimo:20,stock:{P:105,M:53,G:58}},
+    {id:'bota-seg',     name:'Bota de Segurança',    icon:'👢',limite:10, minimo:2, stock:{33:2,34:0,35:7,36:3,37:2,38:3,39:5,40:2,41:3,42:3,43:3,44:6,45:8}},
+    {id:'colete',       name:'Colete',               icon:'🦺',limite:0,  minimo:3, stock:{Unid:14}},
+    {id:'bracelete',    name:'Bracelete Brigadista',  icon:'📿',limite:0,  minimo:0, stock:{Unid:6}},
+  ],
+  movs: [],
+  // Modal state
+  modal: null,
+  modalForm: {},
+  modalErr: '',
+  delConfirm: false,
+  delStockConfirm: false,
+};
+
+// ─── SUPABASE DATA LAYER ──────────────────────────────────────────────────────
+const CAT2ARR = {uniforme:'unifs',papelaria:'pap',kit:'kit',farmacia:'farm',seguranca:'seg'};
+const TAB2CAT = {u:'uniforme',p:'papelaria',k:'kit',f:'farmacia',s:'seguranca'};
+function fmtDate(iso){ try { return new Date(iso).toLocaleDateString('pt-BR'); } catch(e){ return ''; } }
+function fmtDataHora(iso){ try { return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } }
+function scheduleGhSave(){} // compat: os dados agora salvam direto no Supabase
+
+async function loadStock(){
+  const {data,error} = await sb.from('estoque').select('*').order('nome');
+  if(error){ console.warn('estoque:',error.message); return; }
+  S.unifs=[]; S.pap=[]; S.kit=[]; S.farm=[]; S.seg=[];
+  for(const r of data){
+    const arr = CAT2ARR[r.categoria]; if(!arr) continue;
+    S[arr].push({id:r.id,name:r.nome,icon:r.icon,limite:r.limite,minimo:r.minimo,stock:r.stock||{}});
+  }
+}
+async function loadMovs(){
+  const {data,error} = await sb.from('movimentacoes').select('*').order('created_at',{ascending:false}).limit(500);
+  if(error){ console.warn('movimentacoes:',error.message); S.movs=[]; return; }
+  S.movs = data.map(m=>({id:m.id,itemId:m.item_id,item:m.item_nome,cat:m.categoria,tam:m.tamanho,
+    tipo:m.tipo,qtd:m.quantidade,saldo:m.saldo_depois,motivo:m.motivo||'',
+    usuario:m.usuario_nome||'—',data:fmtDataHora(m.created_at),ts:m.created_at}));
+}
+async function loadEmps(){
+  const {data,error} = await sb.from('profiles').select('*').order('nome');
+  if(error){ console.warn('profiles:',error.message); S.emps=[]; return; }
+  S.emps = data.map(p=>({id:p.id,name:p.nome||'',setor:p.setor,turno:p.turno,avatar:p.avatar||'#E8461F',role:p.role,uniforms:p.uniforms||[],objetos:p.objetos||[]}));
+}
+async function loadAll(){
+  await loadStock();
+  await loadMovs();
+  await loadEmps();
+}
+
+async function currentProfile(){
+  const {data:{user}} = await sb.auth.getUser();
+  if(!user) return null;
+  const {data} = await sb.from('profiles').select('*').eq('id',user.id).single();
+  if(!data){
+    return {id:user.id,name:(user.user_metadata&&user.user_metadata.nome)||user.email,setor:null,turno:null,avatar:'#E8461F',role:'employee',uniforms:[],objetos:[],email:user.email};
+  }
+  return {id:data.id,name:data.nome||user.email,setor:data.setor,turno:data.turno,avatar:data.avatar||'#E8461F',role:data.role,uniforms:data.uniforms||[],objetos:data.objetos||[],email:user.email};
+}
+// Tempo real: quando qualquer usuário muda estoque/solicitações/perfis,
+// o servidor avisa os outros e a tela recarrega em segundos.
+let _rtChannel = null, _rtTimer = null;
+function rtRefresh(){ clearTimeout(_rtTimer); _rtTimer = setTimeout(refreshData, 500); }
+function subscribeRealtime(){
+  if (_rtChannel) return;
+  _rtChannel = sb.channel('gu-changes')
+    .on('postgres_changes', {event:'*', schema:'public', table:'estoque'},      rtRefresh)
+    .on('postgres_changes', {event:'*', schema:'public', table:'movimentacoes'}, rtRefresh)
+    .on('postgres_changes', {event:'*', schema:'public', table:'profiles'},     rtRefresh)
+    .subscribe();
+}
+function unsubscribeRealtime(){ if(_rtChannel){ sb.removeChannel(_rtChannel); _rtChannel=null; } }
+
+async function enterApp(){
+  const prof = await currentProfile();
+  if(!prof){ S.modalErr='Não foi possível carregar seu perfil.'; render(); return; }
+  S.auth = {role:prof.role, emp:prof};
+  S.sec  = prof.role==='admin' ? 'dashboard' : 'uniforms';
+  S.modal=null; S.modalForm={}; S.modalErr='';
+  await loadAll();
+  subscribeRealtime();
+  render();
+}
+
+// ─── PERSISTÊNCIA ─────────────────────────────────────────────────────────────
+// Os dados agora vivem no Supabase. saveData vira no-op (rede de segurança caso
+// alguma função antiga ainda a chame); cada mutação escreve direto no banco.
+function saveData(){}
+
+function backupData() {
+  try {
+    const data = {
+      exportedAt: new Date().toLocaleString('pt-BR'),
+      version: 'GoUniform v1',
+      emps:  S.emps,
+      unifs: S.unifs,
+      pap:   S.pap,
+      kit:   S.kit,
+      farm:  S.farm,
+      seg:   S.seg,
+      movs:  S.movs,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10);
+    a.href     = url;
+    a.download = 'gouniform-backup-' + date + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    alert('Erro ao gerar backup: ' + e.message);
+  }
+}
+
+function clearData() {
+  // Os dados agora vivem no Supabase; limpar localmente só encerra a sessão.
+  if (!confirm('Sair e limpar a sessão deste dispositivo?')) return;
+  sb.auth.signOut().finally(() => location.reload());
+}
+
+// ─── RENDER ENGINE ────────────────────────────────────────────────────────────
+function render() {
+  // O modal é montado aqui (e não dentro de getMainHTML) para que também
+  // funcione na tela de login — é lá que fica o "Criar conta".
+  const modalHTML = S.modal ? getModal() : '';
+  document.getElementById('app').innerHTML = (S.auth ? getMainHTML() : getLoginHTML()) + modalHTML;
+  attachEvents();
+}
+
+function setState(updates) {
+  Object.assign(S, updates);
+  render();
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+function getLoginHTML() {
+  const mf = S.modalForm;
+  const msg = S.modalErr ? `<div class="flash e">⚠️ ${esc(S.modalErr)}</div>`
+    : (S.loginNotice ? `<div class="flash o">✅ ${esc(S.loginNotice)}</div>` : '');
+  return `<div class="lw">
+    <div class="ll">
+      <div class="l-brand">
+        <div class="l-mark"><div class="l-mdot"></div><div class="l-mname">GoUniform</div></div>
+        <div class="l-hero">Go<em>Care</em></div>
+        <div class="l-desc">Gerencie uniformes, materiais e equipamentos de toda a equipe.</div>
+        <div class="l-pills">
+          <div class="l-pill">🧥 Uniformes</div>
+          <div class="l-pill">📦 Estoque</div>
+          <div class="l-pill">📎 Papelaria</div>
+          <div class="l-pill">🖱️ Kit Conforto</div>
+        </div>
+      </div>
+      <div class="l-ft">GoUniform • Sistema Interno</div>
+    </div>
+    <div class="lr">
+      <div style="max-width:380px">
+        <div class="l-ftitle">Entrar</div>
+        <div class="l-fsub" id="l-sub">Acesse com seu usuário e senha.</div>
+        ${msg}
+        <div class="lf">
+          <label>Usuário</label>
+          <div class="lf-in">
+            <input type="text" id="l-user" autocomplete="username" autocapitalize="none" placeholder="Seu usuário" value="${esc(mf.user||'')}">
+          </div>
+        </div>
+        <div class="lf">
+          <label>Senha</label>
+          <div class="lf-in">
+            <input type="password" id="l-pwd" autocomplete="current-password" placeholder="Sua senha" value="${esc(mf.pwd||'')}">
+            <button class="l-eye" onclick="togglePwd('l-pwd',this)">👁️</button>
+          </div>
+        </div>
+        <button class="l-btn" id="l-submit" onclick="doLogin()"${S.busy?' disabled':''}>
+          ${S.busy ? 'Entrando…' : 'Entrar →'}
+        </button>
+        <div style="text-align:center;margin-top:18px;font-size:12.5px;color:var(--t4)">
+          Acesso restrito à administração do estoque.
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+async function doLogin() {
+  const user = (document.getElementById('l-user')?.value || '').trim();
+  const pwd  = document.getElementById('l-pwd')?.value || '';
+  S.modalForm = {user, pwd};
+  S.modalErr = ''; S.loginNotice = '';
+  if (!user || !pwd) { S.modalErr = 'Informe usuário e senha.'; render(); return; }
+  const email = userToEmail(user);
+  if (!email) { S.modalErr = 'Usuário inválido.'; render(); return; }
+  S.busy = true; render();
+  const {error} = await sb.auth.signInWithPassword({email, password:pwd});
+  S.busy = false;
+  if (error) { S.modalErr = traduzErro(error.message); render(); return; }
+  await enterApp();
+}
+
+// ─── MAIN APP SHELL ───────────────────────────────────────────────────────────
+function getMainHTML() {
+  const nav = [
+    {id:'dashboard',label:'Dashboard',    icon:'📊'},
+    {id:'stock',    label:'Estoque',      icon:'📦'},
+    {id:'movs',     label:'Movimentações',icon:'🔄'},
+    {id:'admin',    label:'Administração',icon:'⚙️'},
+  ];
+  const navHTML = nav.map(n=>`
+    <div class="sb-item${S.sec===n.id?' on':''}" onclick="goSec('${n.id}')">
+      <span class="sb-ico">${n.icon}</span>${esc(n.label)}
+    </div>`).join('');
+  const titles = {
+    dashboard:{t:'Dashboard',s:'Visão geral do estoque'},
+    stock:    {t:'Estoque',s:'Entradas, saídas e quantidades'},
+    movs:     {t:'Movimentações',s:'Histórico de entradas e saídas'},
+    admin:    {t:'Administração',s:'Dados e saúde do sistema'},
+  };
+  const cur = titles[S.sec]||{t:'',s:''};
+  const hoje = S.movs.filter(m=>m.ts && m.ts.slice(0,10)===new Date().toISOString().slice(0,10)).length;
+  const pills = {movs: hoje>0?`${hoje} hoje`:null};
+  const pillHTML = pills[S.sec] ? `<span class="tb-pill">${esc(pills[S.sec])}</span>` : '';
+  const avBg = 'var(--brand)';
+  const avTxt = 'AD';
+  let content = '';
+  if (S.sec==='dashboard') content = getDashboard();
+  else if (S.sec==='stock') content = getStock();
+  else if (S.sec==='movs') content = getMovs();
+  else if (S.sec==='admin') content = getAdmin();
+  return `<div class="app">
+    <aside class="sb">
+      <div class="sb-top">
+        <div class="sb-logo"><div class="sb-dot"></div>GoCare</div>
+        <div class="sb-sub">Gestão de Uniformes</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-sec">Gestão</div>
+        ${navHTML}
+      </nav>
+      <div class="sb-foot">
+        <div class="sb-user" onclick="doLogout()" title="Clique para sair">
+          <div class="sb-av" style="background:${avBg}">${avTxt}</div>
+          <div>
+            <div class="sb-uname">${esc((S.auth.emp && S.auth.emp.name) || 'Administrador')}</div>
+            <div class="sb-urole">Sair →</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-l">
+          <div class="tb-title">${esc(cur.t)}</div>
+          <div class="tb-sub">${esc(cur.s)}</div>
+        </div>
+        ${pillHTML}
+        <button class="btn bgh" onclick="backupData()" style="font-size:12px;padding:6px 13px" title="Exportar backup dos dados">💾 Backup</button>
+      </div>
+      <div class="content">${content}</div>
+    </div>
+  </div>`;
+}
+
+function goSec(sec) { S.sec = sec; render(); }
+async function doLogout() { unsubscribeRealtime(); await sb.auth.signOut(); S.auth = null; S.sec = 'dashboard'; S.modalForm = {}; S.modalErr = ''; S.loginNotice=''; render(); }
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function getDashboard() {
+  const allItems = [...S.unifs,...S.pap,...S.kit,...S.farm,...S.seg];
+  const alerts = allItems.flatMap(item => {
+    const min = item.minimo||0;
+    return Object.entries(item.stock||{}).flatMap(([sz,qty]) => {
+      const szS = sz!=='Unid'?' '+sz:'';
+      if (qty===0) return [{name:item.name+szS,label:'Sem estoque',out:true}];
+      if (min>0&&qty<=min) return [{name:item.name+szS,label:`${qty} un. (mínimo: ${min})`,out:false}];
+      return [];
+    });
+  }).slice(0,8);
+  const alertsHTML = alerts.length===0
+    ? `<p style="color:var(--t3);font-size:13px;font-weight:500">✅ Todos os itens dentro do mínimo.</p>`
+    : alerts.map(a=>`<div class="aw">${a.out?'🔴':'🟡'} <strong>${esc(a.name)}</strong> — ${esc(a.label)}</div>`).join('');
+
+  const hojeISO = new Date().toISOString().slice(0,10);
+  const doDia = S.movs.filter(m=>m.ts && m.ts.slice(0,10)===hojeISO);
+  const entradasHoje = doDia.filter(m=>m.tipo==='entrada').reduce((n,m)=>n+m.qtd,0);
+  const saidasHoje   = doDia.filter(m=>m.tipo==='saida').reduce((n,m)=>n+m.qtd,0);
+  const totalUn = allItems.reduce((n,it)=>n+Object.values(it.stock||{}).reduce((a,b)=>a+b,0),0);
+
+  const movRows = S.movs.slice(0,7).map(m=>`<tr>
+    <td style="white-space:nowrap;font-size:12px;color:var(--t4)">${esc(m.data)}</td>
+    <td>${movBadge(m.tipo)}</td>
+    <td><strong style="color:var(--t1)">${esc(m.item)}</strong> <span style="color:var(--t4);font-size:12px">${esc(m.tam)}</span></td>
+    <td style="white-space:nowrap"><strong>${m.tipo==='entrada'?'+':'−'}${m.qtd}</strong></td>
+  </tr>`).join('');
+  const movVazio = S.movs.length===0
+    ? `<div class="empty" style="padding:28px"><div class="i">🔄</div><p>Nenhuma movimentação registrada ainda.</p></div>` : '';
+
+  return `<div class="stats">
+    <div class="sc co"><div class="sc-l">Entradas hoje</div><div class="sc-n">${entradasHoje}</div><div class="sc-tag ok">un. recebidas</div></div>
+    <div class="sc cw"><div class="sc-l">Saídas hoje</div><div class="sc-n">${saidasHoje}</div><div class="sc-tag ${saidasHoje>0?'w':'ok'}">un. retiradas</div></div>
+    <div class="sc cu"><div class="sc-l">Em estoque</div><div class="sc-n">${totalUn}</div><div class="sc-tag ok">${allItems.length} itens</div></div>
+  </div>
+  <div class="two">
+    <div class="card" style="padding:0">
+      <div style="padding:22px 24px 6px"><div class="card-t" style="margin:0">Últimas movimentações</div></div>
+      ${movVazio || `<div class="tw"><table><tbody>${movRows}</tbody></table></div>`}
+    </div>
+    <div class="card"><div class="card-t">Alertas de Estoque</div>${alertsHTML}</div>
+  </div>`;
+}
+
+function movBadge(tipo) {
+  return tipo==='entrada'
+    ? `<span class="bdg aprovado">↓ Entrada</span>`
+    : `<span class="bdg rejeitado">↑ Saída</span>`;
+}
+
+// ─── ADMINISTRAÇÃO ────────────────────────────────────────────────────────────
+function getAdmin() {
+  const cats = [
+    {k:'u', nome:'Uniformes',    lista:S.unifs},
+    {k:'p', nome:'Papelaria',    lista:S.pap},
+    {k:'k', nome:'Kit Conforto', lista:S.kit},
+    {k:'f', nome:'Farmácia',     lista:S.farm},
+    {k:'s', nome:'Segurança',    lista:S.seg},
+  ];
+  const todos = cats.flatMap(c=>c.lista);
+  const contaSit = arr => arr.reduce((acc,it)=>{
+    const min = it.minimo||0;
+    for (const q of Object.values(it.stock||{})) {
+      if (q===0) acc.zerado++;
+      else if (min>0 && q<=min) acc.baixo++;
+      else acc.ok++;
+    }
+    return acc;
+  }, {ok:0,baixo:0,zerado:0});
+  const geral = contaSit(todos);
+  const totalUn = todos.reduce((n,it)=>n+Object.values(it.stock||{}).reduce((a,b)=>a+b,0),0);
+
+  const linhasCat = cats.map(c=>{
+    const s = contaSit(c.lista);
+    const un = c.lista.reduce((n,it)=>n+Object.values(it.stock||{}).reduce((a,b)=>a+b,0),0);
+    return `<tr>
+      <td><strong style="color:var(--t1)">${esc(c.nome)}</strong></td>
+      <td>${c.lista.length}</td>
+      <td><strong style="font-family:'Space Grotesk',sans-serif">${un}</strong> <span style="color:var(--t4);font-size:11px">un.</span></td>
+      <td><span class="bdg aprovado">${s.ok} ok</span></td>
+      <td>${s.baixo>0?`<span class="bdg pendente">${s.baixo} baixo</span>`:'<span style="color:var(--t4);font-size:12px">—</span>'}</td>
+      <td>${s.zerado>0?`<span class="bdg rejeitado">${s.zerado} zerado</span>`:'<span style="color:var(--t4);font-size:12px">—</span>'}</td>
+      <td style="text-align:right"><button class="btn bgh sm" onclick="S.sec='stock';S.stockTab='${c.k}';render()">Abrir</button></td>
+    </tr>`;
+  }).join('');
+
+  const admins = S.emps.filter(e=>e.role==='admin');
+  const linhasAdmin = admins.map(a=>{
+    const eu = a.id === S.auth.emp.id;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        <div class="sb-av" style="background:${a.avatar};width:30px;height:30px;font-size:10px;border-radius:8px">${inits(a.name)}</div>
+        <strong style="color:var(--t1)">${esc(a.name)}</strong>
+        ${eu?'<span class="chip">você</span>':''}
+      </div></td>
+      <td><span class="bdg aprovado">Administrador</span></td>
+    </tr>`;
+  }).join('');
+
+  const hojeISO = new Date().toISOString().slice(0,10);
+  const movsHoje = S.movs.filter(m=>m.ts && m.ts.slice(0,10)===hojeISO).length;
+
+  return `<div class="stats">
+    <div class="sc cb"><div class="sc-l">Itens cadastrados</div><div class="sc-n">${todos.length}</div><div class="sc-tag ok">${totalUn} un. no total</div></div>
+    <div class="sc cw"><div class="sc-l">Abaixo do mínimo</div><div class="sc-n">${geral.baixo}</div><div class="sc-tag ${geral.baixo>0?'w':'ok'}">${geral.baixo>0?'Repor':'Em dia'}</div></div>
+    <div class="sc co"><div class="sc-l">Sem estoque</div><div class="sc-n">${geral.zerado}</div><div class="sc-tag ${geral.zerado>0?'w':'ok'}">${geral.zerado>0?'Atenção':'Nenhum'}</div></div>
+  </div>
+
+  <div class="card" style="padding:0;margin-bottom:16px">
+    <div style="padding:18px 22px 4px"><div class="card-t" style="margin:0">Estoque por categoria</div></div>
+    <div class="tw"><table>
+      <thead><tr><th>Categoria</th><th>Itens</th><th>Unidades</th><th>Em dia</th><th>Baixo</th><th>Zerado</th><th></th></tr></thead>
+      <tbody>${linhasCat}</tbody>
+    </table></div>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <div class="card-t">Dados do sistema</div>
+      <p style="font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:14px">
+        Os dados ficam no servidor (Supabase) e são salvos na hora, a cada alteração.
+        Vários usuários podem usar ao mesmo tempo, de computadores diferentes.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn bp sm" onclick="backupData()">💾 Baixar backup (JSON)</button>
+        <button class="btn bgh sm" onclick="exportStockCSV()">📄 Exportar estoque (CSV)</button>
+        <button class="btn bgh sm" onclick="refreshData()">🔄 Recarregar dados</button>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--t4);line-height:1.7">
+        Movimentações hoje: <strong style="color:var(--t2)">${movsHoje}</strong> · no histórico: <strong style="color:var(--t2)">${S.movs.length}</strong><br>
+        Sincronização: <strong style="color:var(--ok)">ao vivo</strong> (atualiza sozinho)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-t">Acesso de administrador</div>
+      ${admins.length ? `<div class="tw"><table><tbody>${linhasAdmin}</tbody></table></div>`
+        : '<p style="font-size:13px;color:var(--t3)">Nenhum administrador encontrado.</p>'}
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--t4);line-height:1.6">
+        Para criar outro administrador, cadastre o acesso no painel do Supabase
+        (Authentication → Users) e defina o perfil como <strong>admin</strong>.
+      </p>
+    </div>
+  </div>`;
+}
+
+function exportStockCSV() {
+  try {
+    const cats = [['Uniformes',S.unifs],['Papelaria',S.pap],['Kit Conforto',S.kit],['Farmácia',S.farm],['Segurança',S.seg]];
+    const linhas = [['Categoria','Item','Tamanho','Quantidade','Mínimo','Limite'].join(';')];
+    for (const [nome,arr] of cats)
+      for (const it of arr)
+        for (const [tam,qtd] of Object.entries(it.stock||{}))
+          linhas.push([nome, it.name, tam, qtd, it.minimo||0, it.limite||0].join(';'));
+    // BOM para o Excel abrir os acentos corretamente
+    const blob = new Blob(['﻿'+linhas.join('\r\n')], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gouniform-estoque-' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('Erro ao exportar: ' + e.message); }
+}
+
+// ─── STOCK ────────────────────────────────────────────────────────────────────
+function getStock() {
+  const tabs = `<div class="tabs">
+    <div class="tab${S.stockTab==='u'?' on':''}" onclick="setStockTab('u')">🧥 Uniformes</div>
+    <div class="tab${S.stockTab==='p'?' on':''}" onclick="setStockTab('p')">📎 Papelaria</div>
+    <div class="tab${S.stockTab==='k'?' on':''}" onclick="setStockTab('k')">🖱️ Kit Conforto</div>
+    <div class="tab${S.stockTab==='f'?' on':''}" onclick="setStockTab('f')">💊 Farmácia</div>
+    <div class="tab${S.stockTab==='s'?' on':''}" onclick="setStockTab('s')">🦺 Segurança</div>
+  </div>`;
+  const items = S.stockTab==='u'?S.unifs:S.stockTab==='p'?S.pap:S.stockTab==='k'?S.kit:S.stockTab==='f'?S.farm:S.seg;
+  const label = S.stockTab==='u'?'Uniformes':S.stockTab==='p'?'Papelaria':S.stockTab==='k'?'Kit Conforto':S.stockTab==='f'?'Farmácia':'Segurança';
+  const chip = (bg,fg,inner)=>`<span style="display:inline-flex;align-items:center;gap:4px;background:${bg};color:${fg};padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600;white-space:nowrap">${inner}</span>`;
+  const list = items.length===0
+    ? `<div class="empty" style="padding:28px 24px"><div class="i">📦</div><p>Nenhum item cadastrado.</p></div>`
+    : `<div class="card" style="padding:0"><div class="tw"><table>
+        <thead><tr><th>Item</th><th>Situação</th><th>Tamanhos / Quantidades</th><th>Total</th><th style="text-align:right">Movimentar</th></tr></thead>
+        <tbody>${items.map(item=>{
+          const total = Object.values(item.stock||{}).reduce((a,b)=>a+b,0);
+          const min   = item.minimo||0;
+          const isOut = Object.values(item.stock||{}).some(q=>q===0);
+          const isLow = !isOut && min>0 && Object.values(item.stock||{}).some(q=>q>0&&q<=min);
+          const sizeChips = Object.entries(item.stock||{}).map(([sz,qty])=>{
+            const c = qty===0?['var(--err-l)','#991B1B']:(min>0&&qty<=min)?['var(--warn-l)','#92400E']:['var(--ok-l)','#15803D'];
+            return chip(c[0],c[1],`${esc(sz)} <strong style="font-family:'Space Grotesk',sans-serif">${qty}</strong>`);
+          }).join(' ');
+          const statusTag = isOut?chip('var(--err-l)','#991B1B','🔴 Zerado')
+            :isLow?chip('var(--warn-l)','#92400E','⚠️ Baixo')
+            :chip('var(--ok-l)','#15803D','✓ OK');
+          const minBadge = min>0?`<span style="margin-left:6px;background:var(--warn-l);color:#92400E;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700">mín. ${min}</span>`:'';
+          return `<tr>
+            <td><div style="display:flex;align-items:center;gap:9px">
+              <span style="font-size:18px;line-height:1">${item.icon}</span>
+              <strong style="color:var(--t1)">${esc(item.name)}</strong>${minBadge}
+            </div></td>
+            <td>${statusTag}</td>
+            <td><div style="display:flex;flex-wrap:wrap;gap:5px">${sizeChips}</div></td>
+            <td style="white-space:nowrap"><strong style="font-family:'Space Grotesk',sans-serif;font-size:15px">${total}</strong>${item.limite>0?`<span style="color:var(--t4);font-size:12px"> / ${item.limite}</span>`:''} <span style="color:var(--t4);font-size:11px">un.</span></td>
+            <td style="text-align:right;white-space:nowrap">
+              <div style="display:inline-flex;gap:6px;align-items:center">
+                <button class="btn bok sm" onclick="openMov('${esc(item.id)}','${S.stockTab}','entrada')" title="Registrar entrada">↓ Entrada</button>
+                <button class="btn bno sm" onclick="openMov('${esc(item.id)}','${S.stockTab}','saida')" title="Registrar saída">↑ Saída</button>
+                <button class="ico-btn" onclick="openEditStock('${esc(item.id)}','${S.stockTab}')" title="Editar item">✏️</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div></div>`;
+  return `<div class="ph"><div class="pt">Estoque</div></div>
+  ${tabs}
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <span style="font-size:13.5px;font-weight:700;color:var(--t2)">${label}</span>
+    <button class="btn bp sm" onclick="openAddStock('${S.stockTab}')">+ Novo item</button>
+  </div>
+  ${list}`;
+}
+function setStockTab(t) { S.stockTab = t; render(); }
+
+// ─── MODAL SYSTEM ─────────────────────────────────────────────────────────────
+// ─── MODAL SYSTEM ─────────────────────────────────────────────────────────────
+function closeModal() {
+  S.modal = null; S.modalForm = {}; S.modalErr = '';
+  S.delStockConfirm = false;
+  render();
+}
+
+function getModal() {
+  const m = S.modal;
+  if (m==='mov')       return getMovModal();
+  if (m==='editStock') return getEditStockModal();
+  if (m==='addStock')  return getAddStockModal();
+  return '';
+}
+
+function modalShell(title, body, footer, wide=false) {
+  return `<div class="ov" onclick="if(event.target===this)closeModal()">
+    <div class="mo${wide?' wide':''}">
+      <div class="mo-hd">
+        <div class="mo-title">${esc(title)}</div>
+        <button class="mo-x" onclick="closeModal()">✕</button>
+      </div>
+      <div class="mo-body">${body}</div>
+      <div class="mo-foot">${footer}</div>
+    </div>
+  </div>`;
+}
+
+// ─── ENTRADA / SAÍDA ──────────────────────────────────────────────────────────
+const MOTIVOS = {
+  entrada: ['Compra','Devolução','Ajuste de inventário','Transferência','Outro'],
+  saida:   ['Entrega a funcionário','Perda / avaria','Ajuste de inventário','Transferência','Outro'],
+};
+
+function openMov(itemId, tab, tipo) {
+  const item = getItemList(tab).find(x=>x.id===itemId);
+  if (!item) return;
+  const tams = Object.keys(item.stock||{});
+  S.modal = 'mov';
+  S.modalForm = {itemId, _tab:tab, tipo, nome:item.name, icon:item.icon,
+                 tam:tams[0]||'', qtd:'', motivo:MOTIVOS[tipo][0], obs:''};
+  S.modalErr = '';
+  render();
+}
+
+function getMovModal() {
+  const mf = S.modalForm;
+  const item = getItemList(mf._tab).find(x=>x.id===mf.itemId) || {stock:{}};
+  const entrada = mf.tipo === 'entrada';
+  const saldo = Number(item.stock?.[mf.tam] ?? 0);
+  const qtd = parseInt(mf.qtd)||0;
+  const novo = entrada ? saldo + qtd : saldo - qtd;
+  const err = S.modalErr ? `<div class="flash e">⚠️ ${esc(S.modalErr)}</div>` : '';
+  const tamOpts = Object.entries(item.stock||{})
+    .map(([t,q])=>`<option value="${esc(t)}"${mf.tam===t?' selected':''}>${esc(t)} — ${q} un.</option>`).join('');
+  const motivoOpts = MOTIVOS[mf.tipo]
+    .map(m=>`<option value="${esc(m)}"${mf.motivo===m?' selected':''}>${esc(m)}</option>`).join('');
+  const previa = qtd>0 ? `
+    <div class="flash ${novo<0?'e':'o'}" style="margin:2px 0 0">
+      ${novo<0 ? `⚠️ Saldo insuficiente — há apenas ${saldo} em ${esc(mf.tam)}.`
+               : `Saldo de <strong>${esc(mf.tam)}</strong>: ${saldo} → <strong>${novo}</strong> un.`}
+    </div>` : '';
+  const body = `${err}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span style="font-size:26px">${item.icon||'📦'}</span>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700">${esc(mf.nome)}</div>
+        <div style="font-size:12px;color:var(--t3)">${entrada?'Registrar entrada no estoque':'Registrar saída do estoque'}</div>
+      </div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label>Tamanho / variação</label>
+        <select onchange="S.modalForm.tam=this.value;render()">${tamOpts}</select>
+      </div>
+      <div class="fg"><label>Quantidade</label>
+        <input type="number" min="1" placeholder="0" value="${esc(mf.qtd||'')}"
+               oninput="S.modalForm.qtd=this.value;render()">
+      </div>
+    </div>
+    ${previa}
+    <div class="fg" style="margin-top:14px"><label>Motivo</label>
+      <select onchange="S.modalForm.motivo=this.value">${motivoOpts}</select>
+    </div>
+    <div class="fg"><label>Observação (opcional)</label>
+      <input placeholder="Ex: nota fiscal 1234, nome de quem retirou..." value="${esc(mf.obs||'')}"
+             oninput="S.modalForm.obs=this.value">
+    </div>`;
+  const podeSalvar = qtd>0 && novo>=0 && !S.busy;
+  const footer = `<button class="btn bgh" onclick="closeModal()">Cancelar</button>
+    <button class="btn ${entrada?'bok':'bno'}" onclick="salvarMov()"${podeSalvar?'':' disabled'}>
+      ${S.busy ? 'Salvando…' : (entrada ? '↓ Confirmar entrada' : '↑ Confirmar saída')}
+    </button>`;
+  return modalShell(entrada?'Entrada de estoque':'Saída de estoque', body, footer);
+}
+
+async function salvarMov() {
+  const mf = S.modalForm;
+  const qtd = parseInt(mf.qtd)||0;
+  if (!mf.tam) { S.modalErr='Selecione o tamanho.'; render(); return; }
+  if (qtd<=0)  { S.modalErr='Informe uma quantidade maior que zero.'; render(); return; }
+  const motivo = [mf.motivo, (mf.obs||'').trim()].filter(Boolean).join(' — ');
+  S.busy = true; S.modalErr=''; render();
+  const {error} = await sb.rpc('registrar_movimentacao', {
+    p_item_id: mf.itemId, p_tamanho: mf.tam, p_tipo: mf.tipo, p_qtd: qtd, p_motivo: motivo
+  });
+  S.busy = false;
+  if (error) { S.modalErr = traduzErro(error.message); render(); return; }
+  await loadStock(); await loadMovs();
+  closeModal();
+}
+
+// ─── MOVIMENTAÇÕES (histórico) ────────────────────────────────────────────────
+function getMovs() {
+  const f = S.movFiltro;
+  const lista = f==='todos' ? S.movs : S.movs.filter(m=>m.tipo===f);
+  const tabs = ['todos','entrada','saida'].map(t=>`
+    <div class="tab${f===t?' on':''}" onclick="S.movFiltro='${t}';render()">
+      ${t==='todos'?'Todas':t==='entrada'?'↓ Entradas':'↑ Saídas'}
+    </div>`).join('');
+  if (S.movs.length===0)
+    return `<div class="tabs">${tabs}</div>
+      <div class="empty"><div class="i">🔄</div><p>Nenhuma movimentação registrada ainda.</p>
+      <p style="font-size:12.5px;color:var(--t4);margin-top:6px">Use os botões de entrada e saída na tela de Estoque.</p></div>`;
+  const rows = lista.map(m=>`<tr>
+    <td style="white-space:nowrap;font-size:12px;color:var(--t4)">${esc(m.data)}</td>
+    <td>${movBadge(m.tipo)}</td>
+    <td><strong style="color:var(--t1)">${esc(m.item)}</strong></td>
+    <td><span class="chip">${esc(m.tam)}</span></td>
+    <td style="white-space:nowrap"><strong style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:${m.tipo==='entrada'?'var(--ok)':'var(--err)'}">${m.tipo==='entrada'?'+':'−'}${m.qtd}</strong></td>
+    <td style="white-space:nowrap;color:var(--t3)">${m.saldo==null?'—':m.saldo+' un.'}</td>
+    <td style="font-size:12.5px;color:var(--t3)">${esc(m.motivo||'—')}</td>
+    <td style="font-size:12.5px;color:var(--t3);white-space:nowrap">${esc(m.usuario)}</td>
+  </tr>`).join('');
+  return `<div class="ph"><div class="pt">Histórico de movimentações</div>
+    <button class="btn bgh sm" onclick="exportMovsCSV()">📄 Exportar CSV</button>
+  </div>
+  <div class="tabs">${tabs}</div>
+  <div class="card" style="padding:0"><div class="tw"><table>
+    <thead><tr><th>Data</th><th>Tipo</th><th>Item</th><th>Tam.</th><th>Qtd.</th><th>Saldo</th><th>Motivo</th><th>Por</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div></div>`;
+}
+
+function exportMovsCSV() {
+  try {
+    const linhas = [['Data','Tipo','Item','Tamanho','Quantidade','Saldo depois','Motivo','Usuário'].join(';')];
+    for (const m of S.movs)
+      linhas.push([m.data, m.tipo, m.item, m.tam, m.qtd, m.saldo==null?'':m.saldo, m.motivo, m.usuario].join(';'));
+    const blob = new Blob(['﻿'+linhas.join('\r\n')], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gouniform-movimentacoes-' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('Erro ao exportar: ' + e.message); }
+}
+
+// ─── STOCK MODALS ─────────────────────────────────────────────────────────────
+function getItemList(tab) { return tab==='u'?S.unifs:tab==='p'?S.pap:tab==='k'?S.kit:tab==='f'?S.farm:S.seg; }
+function setItemList(tab,list) { if(tab==='u') S.unifs=list; else if(tab==='p') S.pap=list; else if(tab==='k') S.kit=list; else if(tab==='f') S.farm=list; else S.seg=list; }
+
+function openEditStock(id, tab) {
+  const item = getItemList(tab).find(x=>x.id===id);
+  if (!item) return;
+  S.modal='editStock'; S.modalForm={...item,_tab:tab,stock:{...item.stock}}; S.modalErr=''; render();
+}
+function getEditStockModal() {
+  const mf = S.modalForm;
+  const stockFields = Object.entries(mf.stock||{}).map(([sz,qty])=>`
+    <div class="qty-g">
+      <label>${esc(sz)}</label>
+      <input type="number" min="0" value="${qty}" onchange="setStockQty('${esc(sz)}',this.value)">
+    </div>`).join('');
+  const body = `<div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Quantidades por tamanho</div>
+    <div class="qty-row" style="margin-bottom:20px">${stockFields}</div>
+    <div class="fr2">
+      <div class="fg"><label>Quantidade mínima (alerta)</label>
+        <input type="number" min="0" placeholder="Ex: 5" value="${mf.minimo||0}" onchange="setStockMeta('minimo',this.value)">
+        <div class="hint">Alerta quando qualquer tamanho atinge esse limite.</div>
+      </div>
+      <div class="fg"><label>Quantidade limite (máximo)</label>
+        <input type="number" min="0" placeholder="Ex: 50" value="${mf.limite||0}" onchange="setStockMeta('limite',this.value)">
+      </div>
+    </div>`;
+  let footer;
+  if (S.delStockConfirm) {
+    footer = `<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;font-weight:600;color:var(--err)">Confirmar exclusão?</span>
+        <button class="btn bno" onclick="deleteStockItem()">Sim, excluir</button>
+        <button class="btn bgh" onclick="S.delStockConfirm=false;render()">Não</button>
+      </div><div></div></div>`;
+  } else {
+    footer = `<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+      <button class="btn bno" onclick="S.delStockConfirm=true;render()">🗑️ Excluir item</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn bgh" onclick="closeModal()">Cancelar</button>
+        <button class="btn bp" onclick="saveEditStock()">Salvar</button>
+      </div></div>`;
+  }
+  return modalShell(`Editar — ${esc(mf.name)}`, body, footer);
+}
+function setStockQty(sz, v) { S.modalForm.stock[sz] = Math.max(0,parseInt(v)||0); }
+function setStockMeta(k, v) { S.modalForm[k] = Math.max(0,parseInt(v)||0); }
+async function saveEditStock() {
+  const mf = S.modalForm;
+  const {error} = await sb.from('estoque').update({
+    stock:mf.stock, minimo:mf.minimo, limite:mf.limite
+  }).eq('id', mf.id);
+  if (error) { alert('Erro ao salvar: ' + traduzErro(error.message)); return; }
+  await loadStock(); closeModal();
+}
+
+function openAddStock(tab) { S.modal='addStock'; S.modalForm={_tab:tab,name:'',icon:'',limite:'',minimo:'',sizes:''}; S.modalErr=''; render(); }
+function getAddStockModal() {
+  const mf = S.modalForm;
+  const label = mf._tab==='u'?'Uniformes':mf._tab==='p'?'Papelaria':'Kit Conforto';
+  const err = S.modalErr?`<div class="flash e">⚠️ ${esc(S.modalErr)}</div>`:'';
+  const body = `${err}
+    <div class="fr2">
+      <div class="fg"><label>Nome</label><input placeholder="Ex: Caneta" value="${esc(mf.name||'')}" oninput="S.modalForm.name=this.value"></div>
+      <div class="fg"><label>Emoji</label><input placeholder="Ex: 🖊️" value="${esc(mf.icon||'')}" oninput="S.modalForm.icon=this.value"></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label>Limite máximo</label><input type="number" min="0" placeholder="Ex: 50" value="${mf.limite||''}" oninput="S.modalForm.limite=this.value"></div>
+      <div class="fg"><label>Quantidade mínima</label><input type="number" min="0" placeholder="Ex: 5" value="${mf.minimo||''}" oninput="S.modalForm.minimo=this.value"></div>
+    </div>
+    <div class="fg">
+      <label>Tamanhos e quantidades iniciais</label>
+      <input placeholder="Ex: P:10, M:8, G:5  ou  Unid:20" value="${esc(mf.sizes||'')}" oninput="S.modalForm.sizes=this.value">
+      <div class="hint">Formato: Tamanho:Quantidade separados por vírgula.</div>
+    </div>`;
+  const footer = `<button class="btn bgh" onclick="closeModal()">Cancelar</button><button class="btn bp" onclick="addStockItem()">Adicionar</button>`;
+  return modalShell(`Novo item — ${label}`, body, footer);
+}
+async function deleteStockItem() {
+  const mf = S.modalForm;
+  const {error} = await sb.from('estoque').delete().eq('id', mf.id);
+  if (error) { alert('Erro ao excluir: ' + traduzErro(error.message)); return; }
+  S.delStockConfirm = false;
+  await loadStock(); closeModal();
+}
+
+async function addStockItem() {
+  const mf = S.modalForm;
+  if (!mf.name?.trim()) { S.modalErr='Informe o nome.'; render(); return; }
+  const stock = {};
+  (mf.sizes||'Unid').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    const parts = s.includes(':') ? s.split(':') : [s,'0'];
+    stock[parts[0].trim()] = parseInt(parts[1])||0;
+  });
+  const item = {id:'item_'+Date.now(), categoria:TAB2CAT[mf._tab], nome:mf.name.trim(),
+    icon:(mf.icon||'').trim()||'📦', limite:parseInt(mf.limite)||0, minimo:parseInt(mf.minimo)||0, stock};
+  const {error} = await sb.from('estoque').insert(item);
+  if (error) { S.modalErr = traduzErro(error.message); render(); return; }
+  await loadStock(); closeModal();
+}
+
+// ─── EVENT ATTACHMENT ─────────────────────────────────────────────────────────
+// Guarda o que foi digitado no login sem re-renderizar (não perde o foco).
+function attachEvents() {
+  const userInp = document.getElementById('l-user');
+  const pwdInp  = document.getElementById('l-pwd');
+
+  if (userInp) {
+    userInp.addEventListener('input', e => { S.modalForm.user = e.target.value; });
+    userInp.addEventListener('keydown', e => { if (e.key==='Enter') { document.getElementById('l-pwd')?.focus(); } });
+  }
+  if (pwdInp) {
+    pwdInp.addEventListener('input', e => { S.modalForm.pwd = e.target.value; });
+    pwdInp.addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+S.modalForm = {};
+
+function loadingHTML(){
+  return `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6F4F1;font-family:'Inter',sans-serif;">
+    <div style="text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#1C1917">Carregando GoUniform…</div>
+      <div style="font-size:13px;color:#78716C;margin-top:6px">Conectando ao servidor</div>
+    </div>
+  </div>`;
+}
+
+// Recarrega dados do servidor — mas nunca no meio de uma edição (modal aberto),
+// para não sobrescrever o que o usuário está digitando.
+async function refreshData(){
+  if (!S.auth || S.modal) return;
+  await loadAll();
+  render();
+}
+
+(async () => {
+  document.getElementById('app').innerHTML = loadingHTML();
+  const {data:{session}} = await sb.auth.getSession();
+  if (session) { await enterApp(); }
+  else { S.auth = null; render(); }
+
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') { S.auth = null; render(); }
+  });
+
+  setInterval(refreshData, 60000);
+  window.addEventListener('focus', refreshData);
+})();
+</script>
+</body>
+</html>
