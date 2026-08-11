@@ -217,10 +217,34 @@ tbody tr:hover td{background:var(--surf2);}
 .l-btn{width:100%;height:52px;border-radius:11px;background:var(--brand);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;transition:background .14s,box-shadow .14s;margin-top:6px;}
 .l-btn:hover{background:var(--brand-h);box-shadow:0 6px 20px rgba(232,70,31,.35);}
 .l-btn:disabled{background:var(--bd);color:var(--t4);cursor:not-allowed;box-shadow:none;}
-</style>
+/* RELATÓRIO IMPRESSO */
+#print-area{display:none;}
+@media print{
+  body{background:#fff;}
+  .app,.ov{display:none!important;}
+  #print-area{display:block;padding:0;color:#000;font-family:'Inter',sans-serif;}
+  @page{margin:14mm;}
+  .rp-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:6px;}
+  .rp-t{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.3px;}
+  .rp-s{font-size:11px;color:#444;margin-top:2px;}
+  .rp-meta{font-size:10px;color:#444;text-align:right;line-height:1.6;}
+  .rp-sum{display:flex;gap:22px;font-size:10.5px;color:#222;margin:10px 0 12px;}
+  .rp-sum b{font-family:'Space Grotesk',sans-serif;font-size:14px;}
+  #print-area table{width:100%;border-collapse:collapse;font-size:10.5px;}
+  #print-area th{text-align:left;border-bottom:1.5px solid #000;padding:6px 6px;font-size:9px;text-transform:uppercase;letter-spacing:.6px;}
+  #print-area td{border-bottom:.5px solid #bbb;padding:5px 6px;}
+  #print-area tr{page-break-inside:avoid;}
+  #print-area thead{display:table-header-group;}
+  .rp-cat{background:#eee!important;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .rp-num{text-align:right;font-variant-numeric:tabular-nums;}
+  .rp-sit{font-size:9px;text-transform:uppercase;letter-spacing:.4px;}
+  .rp-foot{margin-top:26px;display:flex;gap:40px;font-size:10px;color:#333;}
+  .rp-sign{flex:1;border-top:1px solid #000;padding-top:4px;}
+}</style>
 </head>
 <body>
 <div id="app"></div>
+<div id="print-area"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -634,12 +658,63 @@ function getDashboard() {
     <div class="sc cw"><div class="sc-l">Saídas hoje</div><div class="sc-n">${saidasHoje}</div><div class="sc-tag ${saidasHoje>0?'w':'ok'}">un. retiradas</div></div>
     <div class="sc cu"><div class="sc-l">Em estoque</div><div class="sc-n">${totalUn}</div><div class="sc-tag ok">${allItems.length} itens</div></div>
   </div>
+  ${getStockChart()}
   <div class="two">
     <div class="card" style="padding:0">
       <div style="padding:22px 24px 6px"><div class="card-t" style="margin:0">Últimas movimentações</div></div>
       ${movVazio || `<div class="tw"><table><tbody>${movRows}</tbody></table></div>`}
     </div>
     <div class="card"><div class="card-t">Alertas de Estoque</div>${alertsHTML}</div>
+  </div>`;
+}
+
+// Barras horizontais: unidades em estoque por categoria (série única, um só tom).
+function getStockChart() {
+  const cats = CATS_REL.map(c => {
+    const itens = getItemList(c.k);
+    let un=0, repor=0, zerado=0;
+    for (const it of itens) {
+      const min = it.minimo||0;
+      for (const q of Object.values(it.stock||{})) {
+        un += q;
+        if (q===0) zerado++;
+        else if (min>0 && q<=min) repor++;
+      }
+    }
+    return {nome:c.nome, k:c.k, itens:itens.length, un, repor, zerado};
+  });
+  const max = Math.max(...cats.map(c=>c.un), 1);
+  const total = cats.reduce((n,c)=>n+c.un,0);
+  if (total===0)
+    return `<div class="card"><div class="card-t">Estoque por categoria</div>
+      <p style="color:var(--t3);font-size:13px">Nenhum item com quantidade cadastrada.</p></div>`;
+
+  const linhas = cats.map(c=>{
+    const pct = c.un>0 ? Math.max(1.5, (c.un/max)*100) : 0;
+    const alerta = c.zerado>0 ? `<span style="color:var(--err);font-weight:600">${c.zerado} zerado${c.zerado>1?'s':''}</span>`
+      : c.repor>0 ? `<span style="color:var(--warn);font-weight:600">${c.repor} a repor</span>`
+      : `<span style="color:var(--ok)">em dia</span>`;
+    return `<div style="display:grid;grid-template-columns:120px 1fr 92px;align-items:center;gap:12px;padding:7px 0;cursor:pointer"
+      onclick="S.sec='stock';S.stockTab='${c.k}';render()"
+      title="${esc(c.nome)}: ${c.un} unidades em ${c.itens} ${c.itens===1?'item':'itens'}">
+      <div style="font-size:12.5px;font-weight:600;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.nome)}</div>
+      <div style="background:var(--bg);border-radius:4px;height:16px;position:relative;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:var(--brand);border-radius:0 4px 4px 0"></div>
+      </div>
+      <div style="text-align:right;font-size:12px;line-height:1.35">
+        <strong style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--t1)">${c.un}</strong>
+        <span style="color:var(--t4);font-size:11px"> un.</span><br>
+        <span style="font-size:10.5px">${alerta}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+      <div class="card-t" style="margin:0">Estoque por categoria</div>
+      <div style="font-size:11.5px;color:var(--t3)">${total} unidades no total</div>
+    </div>
+    ${linhas}
   </div>`;
 }
 
@@ -818,7 +893,10 @@ function getStock() {
   ${tabs}
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
     <span style="font-size:13.5px;font-weight:700;color:var(--t2)">${label}</span>
-    <button class="btn bp sm" onclick="openAddStock('${S.stockTab}')">+ Novo item</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn bgh sm" onclick="openRelatorio()">📄 Relatório</button>
+      <button class="btn bp sm" onclick="openAddStock('${S.stockTab}')">+ Novo item</button>
+    </div>
   </div>
   ${list}`;
 }
@@ -838,6 +916,7 @@ function getModal() {
   if (m==='editStock') return getEditStockModal();
   if (m==='addStock')  return getAddStockModal();
   if (m==='delStock')  return getDelStockModal();
+  if (m==='relatorio') return getRelatorioModal();
   return '';
 }
 
@@ -935,6 +1014,138 @@ async function salvarMov() {
   if (error) { S.modalErr = traduzErro(error.message); render(); return; }
   await loadStock(); await loadMovs();
   closeModal();
+}
+
+// ─── RELATÓRIO DE ESTOQUE ─────────────────────────────────────────────────────
+const CATS_REL = [
+  {k:'u',nome:'Uniformes'},{k:'p',nome:'Papelaria'},{k:'k',nome:'Kit Conforto'},
+  {k:'f',nome:'Farmácia'},{k:'s',nome:'Segurança'},
+];
+
+function openRelatorio() {
+  S.modal='relatorio';
+  S.modalForm={escopo:S.stockTab, situacao:'todas', zerados:true};
+  S.modalErr=''; render();
+}
+
+function getRelatorioModal() {
+  const mf = S.modalForm;
+  const escopoOpts = [`<option value="todas"${mf.escopo==='todas'?' selected':''}>Todas as categorias</option>`]
+    .concat(CATS_REL.map(c=>`<option value="${c.k}"${mf.escopo===c.k?' selected':''}>${esc(c.nome)}</option>`)).join('');
+  const linhas = linhasRelatorio(mf);
+  const body = `
+    <p style="font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:16px">
+      Gera um relatório pronto para imprimir ou salvar em PDF. Na janela de impressão,
+      escolha <strong>“Salvar como PDF”</strong> para guardar o arquivo.
+    </p>
+    <div class="fr2">
+      <div class="fg"><label>Categoria</label>
+        <select onchange="S.modalForm.escopo=this.value;render()">${escopoOpts}</select>
+      </div>
+      <div class="fg"><label>Situação</label>
+        <select onchange="S.modalForm.situacao=this.value;render()">
+          <option value="todas"${mf.situacao==='todas'?' selected':''}>Todos os itens</option>
+          <option value="repor"${mf.situacao==='repor'?' selected':''}>Só o que precisa repor</option>
+          <option value="zerado"${mf.situacao==='zerado'?' selected':''}>Só o que está zerado</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:0">
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px">
+        <input type="checkbox" style="width:15px;height:15px;accent-color:var(--brand)" ${mf.zerados?'checked':''}
+               onchange="S.modalForm.zerados=this.checked;render()">
+        Incluir tamanhos sem estoque
+      </label>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:12.5px;color:var(--t3)">
+      ${linhas.length ? `O relatório terá <strong style="color:var(--t1)">${linhas.length}</strong> linha${linhas.length>1?'s':''}.`
+                      : 'Nenhum item atende a esses filtros.'}
+    </div>`;
+  const footer = `<button class="btn bgh" onclick="closeModal()">Cancelar</button>
+    <button class="btn bgh" onclick="exportStockCSV()">Baixar CSV</button>
+    <button class="btn bp" onclick="imprimirRelatorio()"${linhas.length?'':' disabled'}>Gerar relatório</button>`;
+  return modalShell('Relatório de estoque', body, footer);
+}
+
+// Monta as linhas conforme os filtros escolhidos.
+function linhasRelatorio(mf) {
+  const cats = mf.escopo==='todas' ? CATS_REL : CATS_REL.filter(c=>c.k===mf.escopo);
+  const out = [];
+  for (const c of cats) {
+    for (const item of getItemList(c.k)) {
+      const min = item.minimo||0;
+      for (const [tam,qtd] of Object.entries(item.stock||{})) {
+        const zerado = qtd===0;
+        const baixo  = !zerado && min>0 && qtd<=min;
+        if (!mf.zerados && zerado) continue;
+        if (mf.situacao==='repor'  && !(zerado||baixo)) continue;
+        if (mf.situacao==='zerado' && !zerado) continue;
+        out.push({cat:c.nome, item:item.name, tam, qtd, min,
+                  sit: zerado?'Zerado':baixo?'Abaixo do mínimo':'Em dia'});
+      }
+    }
+  }
+  return out;
+}
+
+function imprimirRelatorio() {
+  const mf = S.modalForm;
+  const linhas = linhasRelatorio(mf);
+  if (!linhas.length) return;
+  const agora = new Date().toLocaleString('pt-BR');
+  const escopoTxt = mf.escopo==='todas' ? 'Todas as categorias'
+    : (CATS_REL.find(c=>c.k===mf.escopo)||{}).nome;
+  const sitTxt = mf.situacao==='repor' ? 'Somente itens a repor'
+    : mf.situacao==='zerado' ? 'Somente itens zerados' : 'Todos os itens';
+  const totUn   = linhas.reduce((n,l)=>n+l.qtd,0);
+  const nZerado = linhas.filter(l=>l.sit==='Zerado').length;
+  const nBaixo  = linhas.filter(l=>l.sit==='Abaixo do mínimo').length;
+  const usuario = (S.auth && S.auth.emp && S.auth.emp.name) || 'Administrador';
+
+  let corpo = '', catAtual = '';
+  for (const l of linhas) {
+    if (l.cat !== catAtual) {
+      catAtual = l.cat;
+      corpo += `<tr class="rp-cat"><td colspan="5">${esc(catAtual)}</td></tr>`;
+    }
+    corpo += `<tr>
+      <td>${esc(l.item)}</td>
+      <td>${esc(l.tam)}</td>
+      <td class="rp-num">${l.qtd}</td>
+      <td class="rp-num">${l.min||'—'}</td>
+      <td class="rp-sit">${esc(l.sit)}</td>
+    </tr>`;
+  }
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="rp-head">
+      <div>
+        <div class="rp-t">Relatório de Estoque</div>
+        <div class="rp-s">GoCare — Gestão de Uniformes</div>
+      </div>
+      <div class="rp-meta">
+        Emitido em ${esc(agora)}<br>
+        Por ${esc(usuario)}<br>
+        ${esc(escopoTxt)} · ${esc(sitTxt)}
+      </div>
+    </div>
+    <div class="rp-sum">
+      <div>Linhas<br><b>${linhas.length}</b></div>
+      <div>Unidades<br><b>${totUn}</b></div>
+      <div>Abaixo do mínimo<br><b>${nBaixo}</b></div>
+      <div>Zerados<br><b>${nZerado}</b></div>
+    </div>
+    <table>
+      <thead><tr><th>Item</th><th>Tamanho</th><th class="rp-num">Qtd.</th><th class="rp-num">Mínimo</th><th>Situação</th></tr></thead>
+      <tbody>${corpo}</tbody>
+    </table>
+    <div class="rp-foot">
+      <div class="rp-sign">Conferido por</div>
+      <div class="rp-sign">Data</div>
+    </div>`;
+  closeModal();
+  setTimeout(()=>window.print(), 120);
 }
 
 // ─── EXPORTAÇÃO DO HISTÓRICO ──────────────────────────────────────────────────
